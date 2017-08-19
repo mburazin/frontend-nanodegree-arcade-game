@@ -1,9 +1,22 @@
 var gameBoard = {
   /* game board is consisted of tiles (squares)
      which is a surface for objects to move on */
-  // single tile dimensions
+  // single tile dimensions in pixels
   "tileWidth": 101,
-  "tileHeight": 83
+  "tileHeight": 83,
+
+  // no of rows and cols
+  "rows": 6,
+  "cols": 5,
+
+  // verifies if the position is inside the board
+  insideBoard: function(x, y) {
+    if (x >= this.cols * this.tileWidth || x < 0)
+      return false;
+    if (y >= this.rows * this.tileHeight || y < 0)
+      return false;
+    return true;
+  }
 };
 
 var DrawableObject = function(sprite, locX, locY) {
@@ -44,17 +57,17 @@ var Player = function() {
   // "that" is for accessing "this" in private methods
   var that;
   var _stepInPixels = {
-    "left": {"x": -101, "y": 0},
-    "up": {"x": 0, "y": -83},
-    "right": {"x": 101, "y": 0},
-    "down": {"x": 0, "y": 83},
+    "left": {"x": -gameBoard.tileWidth, "y": 0},
+    "up": {"x": 0, "y": -gameBoard.tileHeight},
+    "right": {"x": gameBoard.tileWidth, "y": 0},
+    "down": {"x": 0, "y": gameBoard.tileHeight},
     "same": {"x": 0, "y": 0}
   };
   var _nextStep = 'same';
-  var _PLAYER_TILE_OFFSET = 8;
+  var _PLAYER_TILE_OFFSET = 30;
   var _initialPosition = {
     "x": 2 * gameBoard.tileWidth, // 3rd column
-    "y": 5 * (gameBoard.tileHeight - _PLAYER_TILE_OFFSET) // 6th row
+    "y": 5 * gameBoard.tileHeight -  _PLAYER_TILE_OFFSET // 6th row
   };
 
   /* Private methods */
@@ -76,9 +89,18 @@ var Player = function() {
   Player.prototype = Object.create(Enemy.prototype);
   Player.prototype.constructor = Player;
   Player.prototype.update = function() {
+    var newX = this.x;
+    var newY = this.y;
+
     if (_stepInPixels.hasOwnProperty(_nextStep)) {
-      this.x += _stepInPixels[_nextStep].x;
-      this.y += _stepInPixels[_nextStep].y;
+      newX += _stepInPixels[_nextStep].x;
+      newY += _stepInPixels[_nextStep].y;
+    }
+
+    // update current position only if next step is inside the board
+    if (gameBoard.insideBoard(newX, newY + _PLAYER_TILE_OFFSET)) {
+      this.x = newX;
+      this.y = newY;
     }
     _nextStep = 'same';
 

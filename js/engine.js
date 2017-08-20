@@ -23,15 +23,20 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
+        scoreBoard = doc.createElement('div'),
+        lives = doc.createElement('div'),
         lastTime,
-        scoreBoard = doc.createElement('div');
+        currentScore = 0,
+        livesLeft = 5;
 
     canvas.width = 505;
     canvas.height = 606;
     doc.body.appendChild(canvas);
 
-    scoreBoard.innerHTML = '<p>Score: <span id="score">0</span></p>';
+    scoreBoard.innerHTML = '<p>Score: <span id="score">' + currentScore + '</span></p>';
+    lives.innerHTML = '<p>Lives: <span id="lives">' + livesLeft + '</span>/5</p>';
     doc.body.appendChild(scoreBoard);
+    doc.body.appendChild(lives);
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
@@ -70,6 +75,7 @@ var Engine = (function(global) {
     function init() {
         reset();
         lastTime = Date.now();
+        player.onWin(handleWin);
         main();
     }
 
@@ -86,6 +92,8 @@ var Engine = (function(global) {
         updateEntities(dt);
         if(gameBoard.collisionOccured()) {
           player.kill();
+          var lives = document.querySelector('#lives');
+          lives.textContent = --livesLeft;
         }
     }
 
@@ -168,6 +176,13 @@ var Engine = (function(global) {
         // noop
         gameBoard.enemies = allEnemies;
         gameBoard.player = player;
+    }
+
+    function handleWin() {
+      console.log("WIN!!!!!");
+      var score = document.querySelector('#score');
+      console.log(score.textContent);
+      score.textContent = ++currentScore;
     }
 
     /* Go ahead and load all of the images we know we're going to need to

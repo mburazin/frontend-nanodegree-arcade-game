@@ -23,11 +23,15 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        lastTime;
+        lastTime,
+        scoreBoard = doc.createElement('div');
 
     canvas.width = 505;
     canvas.height = 606;
     doc.body.appendChild(canvas);
+
+    scoreBoard.innerHTML = '<p>Score: <span id="score">0</span></p>';
+    doc.body.appendChild(scoreBoard);
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
@@ -80,7 +84,9 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        if(gameBoard.collisionOccured()) {
+          player.kill();
+        }
     }
 
     /* This is called by the update function and loops through all of the
@@ -160,6 +166,8 @@ var Engine = (function(global) {
      */
     function reset() {
         // noop
+        gameBoard.enemies = allEnemies;
+        gameBoard.player = player;
     }
 
     /* Go ahead and load all of the images we know we're going to need to

@@ -31,6 +31,12 @@ var Engine = (function(global) {
         currentScore = 0,
         livesLeft = 5;
 
+    var collectibles = [
+      BlueGem,
+      GreenGem,
+      OrangeGem
+    ];
+
     gameContainer.id = "game-container";
     gameContainer.width = canvas.width = 505;
     gameContainer.height = canvas.height = 606;
@@ -38,8 +44,8 @@ var Engine = (function(global) {
     doc.body.appendChild(gameContainer);
     gameContainer.appendChild(canvas);
 
-    scoreBoard.innerHTML = '<p>Score: <span id="score">' + currentScore + '</span></p>';
-    lives.innerHTML = '<p>Lives: <span id="lives">' + livesLeft + '</span>/5</p>';
+    scoreBoard.innerHTML = '<p class="stats">Score: <span id="score">' + currentScore + '</span></p>';
+    lives.innerHTML = '<p class="stats">Lives: <span id="lives">' + livesLeft + '</span>/5</p>';
     doc.body.appendChild(scoreBoard);
     doc.body.appendChild(lives);
 
@@ -108,6 +114,13 @@ var Engine = (function(global) {
         if(livesLeft <= 0) {
           gameContainer.appendChild(gameOverBox);
         }
+
+        var collectedItem = gameBoard.itemCollected()
+        if(collectedItem) {
+          updateScore(collectedItem.points);
+          var index = gameBoard.collectibleItems.indexOf(collectedItem);
+          gameBoard.collectibleItems.splice(index, 1);
+        }
     }
 
     /* This is called by the update function and loops through all of the
@@ -171,13 +184,15 @@ var Engine = (function(global) {
      * on your enemy and player entities within app.js
      */
     function renderEntities() {
+        collectibleItems.forEach(function(collectibleItem) {
+          collectibleItem.render();
+        });
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
-
         player.render();
     }
 
@@ -189,14 +204,26 @@ var Engine = (function(global) {
         // noop
         gameBoard.enemies = allEnemies;
         gameBoard.player = player;
+        gameBoard.collectibleItems = collectibleItems;
+
+        win.setTimeout(spawnCollectible, getRandomInt(2, 10)*1000);
     }
 
     function handleWin() {
-      console.log("WIN!!!!!");
+      updateScore(10);
+    }
+
+    function updateScore(points) {
       var score = document.querySelector('#score');
-      console.log(score.textContent);
-      currentScore += 10;
+      currentScore += points;
       score.textContent = currentScore;
+    }
+
+    function spawnCollectible() {
+      var itemIndex = getRandomInt(0, collectibles.length);
+      collectibleItems.push(new collectibles[itemIndex]());
+
+      win.setTimeout(spawnCollectible, getRandomInt(2, 10)*1000);
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -208,7 +235,10 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/Gem Blue.png',
+        'images/Gem Green.png',
+        'images/Gem Orange.png'
     ]);
     Resources.onReady(init);
 

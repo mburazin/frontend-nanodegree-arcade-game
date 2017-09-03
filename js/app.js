@@ -1,3 +1,10 @@
+// greater or equal to min and lower than (but not equal to) max
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 var gameBoard = {
   /* game board is consisted of tiles (squares)
      which is a surface for objects to move on */
@@ -12,18 +19,19 @@ var gameBoard = {
   // containers for enemies and players
   "enemies": [],
   "player": {},
+  "collectibleItems": [],
 
   collisionOccured: function() {
     var collision = false;
     var player = this.player;
-    //console.log("Player: " + player.x + ", " + player.y);
+
     // position of player within the image/tile
     var playerPosImg = player.getObjectWithinImage();
     var playerX = player.x + playerPosImg.x;
     var playerY = player.y + playerPosImg.y;
 
     this.enemies.forEach(function(enemy) {
-      // console.log("Enemy: " + enemy.x + ", " + enemy.y);
+      // position of enemy within the image/tile
       var enemyPosImg = enemy.getObjectWithinImage();
       var enemyX = enemy.x + enemyPosImg.x;
       var enemyY = enemy.y + enemyPosImg.y;
@@ -38,6 +46,33 @@ var gameBoard = {
     });
 
     return collision;
+  },
+
+  itemCollected: function() {
+    var player = this.player;
+    var collectedItem = null;
+
+    // position of player within the image/tile
+    var playerPosImg = player.getObjectWithinImage();
+    var playerX = player.x + playerPosImg.x;
+    var playerY = player.y + playerPosImg.y;
+
+    this.collectibleItems.forEach(function(item) {
+      // position of collectible item within the image/tile
+      var itemPosImg = item.getObjectWithinImage();
+      var itemX = item.x + itemPosImg.x;
+      var itemY = item.y + itemPosImg.y;
+
+      if(itemX < playerX + playerPosImg.width &&
+         itemX + itemPosImg.width > playerX &&
+         itemY < playerY + playerPosImg.height &&
+         itemY + itemPosImg.height > playerY ) {
+           // item collected
+           collectedItem = item;
+         }
+    });
+
+    return collectedItem;
   },
 
   // verifies if the position is inside the board
@@ -62,6 +97,57 @@ DrawableObject.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+var Collectible = function() {
+
+  /* Actual object position and dimensions within the image sprite */
+  var _objectWithinImage = {
+    "x": 0,
+    "y": 55,
+    "width": 101,
+    "height": 105
+  };
+
+  // constructor
+  var Collectible  = function(sprite, points) {
+    // appears random on the street
+    var x = getRandomInt(0, gameBoard.cols) * gameBoard.tileWidth,
+        y = getRandomInt(1, gameBoard.rows-2) * gameBoard.tileHeight - 30;
+    this.points = points;
+
+    DrawableObject.call(this, sprite, x, y);
+  };
+
+  Collectible.prototype = Object.create(DrawableObject.prototype);
+  Collectible.prototype.constructor = Collectible;
+  Collectible.prototype.getObjectWithinImage = function() {
+    return _objectWithinImage;
+  };
+
+  return Collectible;
+}();
+
+
+var BlueGem = function() {
+  Collectible.call(this, 'images/Gem Blue.png', 1);
+};
+
+BlueGem.prototype = Object.create(Collectible.prototype);
+BlueGem.prototype.constructor = BlueGem;
+
+var GreenGem = function() {
+  Collectible.call(this, 'images/Gem Green.png', 2);
+};
+
+GreenGem.prototype = Object.create(Collectible.prototype);
+GreenGem.prototype.constructor = GreenGem;
+
+var OrangeGem = function() {
+  Collectible.call(this, 'images/Gem Orange.png', 3);
+};
+
+OrangeGem.prototype = Object.create(Collectible.prototype);
+OrangeGem.prototype.constructor = OrangeGem;
+
 var Enemy = function() {
   /* Private members */
   /* Enemy position and dimensions within the image sprite */
@@ -72,10 +158,15 @@ var Enemy = function() {
     "height": 66
   };
 
+  var _ENEMY_TILE_Y_OFFSET = -25;
+
   // Constructor
-  var Enemy = function(locX, locY, speed, gameBoard) {
-      this.speed = speed; // px/s
+  var Enemy = function(gameBoard) {
+      this.speed = getRandomInt(150, 600); // px/s
       this.gameBoard = gameBoard;
+
+      var locX = -500;
+      var locY = getRandomInt(1, 3+1) * gameBoard.tileHeight + _ENEMY_TILE_Y_OFFSET;
 
       // call superclass constructor
       DrawableObject.call(this, 'images/enemy-bug.png', locX, locY);
@@ -90,6 +181,7 @@ var Enemy = function() {
       // which will ensure the game runs at the same speed for
       // all computers.
       this.x += this.speed * dt;
+      this.x = this.x > (this.gameBoard.rows * this.gameBoard.tileWidth + 500) ? -500 : this.x;
   };
   Enemy.prototype.getObjectWithinImage = function() {
     return _enemyWithinImage;
@@ -199,8 +291,13 @@ var Player = function() {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var allEnemies = [];
-allEnemies[0] = new Enemy(0*101, 2*60, 83, gameBoard);
+var i;
+for (i=0; i<5; i++) {
+  allEnemies[i] = new Enemy(gameBoard);
+}
 var player = new Player(gameBoard);
+var collectibleItems = [];
+
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.

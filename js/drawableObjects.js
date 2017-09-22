@@ -27,6 +27,17 @@ DrawableObject.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+/**
+ * Sets/changes the object position/coordinates
+ * @function setPosition
+ * @param {number} x - new x coordinate in pixels
+ * @param {number} y - new y coordinate in pixels
+ */
+DrawableObject.prototype.setPosition = function(x, y) {
+    this.x = x;
+    this.y = y;
+};
+
 
 /**
  * Class describing a Collectible object (collectible by the player)
@@ -156,9 +167,12 @@ var Enemy = function() {
       // You should multiply any movement by the dt parameter
       // which will ensure the game runs at the same speed for
       // all computers.
-      // Makes sure the enemies loop around the game board
+      // Makes sure the enemies loop around the game board and change street
       this.x += this.speed * dt;
-      this.x = this.x > (this.gameBoard.rows * this.gameBoard.tileWidth + 500) ? -500 : this.x;
+      if (this.x > (this.gameBoard.cols * this.gameBoard.tileWidth + 500)) {
+        this.x = -500;
+        this.y = getRandomInt(1, 3+1) * GameBoard.tileHeight + _ENEMY_TILE_Y_OFFSET;
+      }
   };
 
   /**

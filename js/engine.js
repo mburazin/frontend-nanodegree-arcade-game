@@ -237,14 +237,16 @@ var Engine = (function(global) {
         GameBoard.player = player;
         GameBoard.collectibleItems = collectibleItems;
 
-        win.setTimeout(spawnCollectible, getRandomInt(2, 7)*1000);
+        // creates a new collectible object on the board every few random seconds
+        win.setTimeout(spawnCollectible, getRandomInt(2, 8)*1000);
     }
 
     function spawnCollectible() {
-      var itemIndex = getRandomInt(0, collectibles.length);
-      collectibleItems.push(new collectibles[itemIndex]());
+        var itemIndex = getRandomInt(0, collectibles.length);
+        collectibleItems.push(new collectibles[itemIndex]());
 
-      win.setTimeout(spawnCollectible, getRandomInt(2, 10)*1000);
+        // creates a new collectible object on the board every few random seconds
+        win.setTimeout(spawnCollectible, getRandomInt(2, 8)*1000);
     }
 
     /* Go ahead and load all of the images we know we're going to need to

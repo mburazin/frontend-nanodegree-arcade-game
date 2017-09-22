@@ -1,17 +1,27 @@
-/* Resources.js
- * This is simply an image loading utility. It eases the process of loading
- * image files so that they can be used within your game. It also includes
- * a simple "caching" layer so it will reuse cached images if you attempt
- * to load the same image multiple times.
+/**
+ * @file Resources.js - Contains functionality for loading game resources and
+ * assets.
+ * @author Marko Burazin <marko.burazin1@gmail.com>
+ * @description This is simply an image loading utility. It eases the process
+ * of loading image files so that they can be used within your game. It also
+ * includes a simple "caching" layer so it will reuse cached images if you
+ * attempt to load the same image multiple times.
  */
+
 (function() {
     var resourceCache = {};
     var loading = [];
     var readyCallbacks = [];
 
-    /* This is the publicly accessible image loading function. It accepts
-     * an array of strings pointing to image files or a string for a single
-     * image. It will then call our private image loading function accordingly.
+    /**
+     * This is the publicly accessible image loading function
+     * @function load
+     * @param {string|string[]} urlOrArr - string or array of string pointing
+     *                                     to image file(s)
+     * @returns {Image} Object that contains loaded image
+     * @description It accepts an array of strings pointing to image files
+     * or a string for a single image. It will then call our private image
+     * loading function accordingly.
      */
     function load(urlOrArr) {
         if(urlOrArr instanceof Array) {
@@ -70,16 +80,24 @@
         }
     }
 
-    /* This is used by developers to grab references to images they know
-     * have been previously loaded. If an image is cached, this functions
+    /**
+     * This is used by developers to grab references to images they know
+     * have been previously loaded
+     * @function get
+     * @param {string} url - string pointing to image file
+     * @returns {Image} Object that contains loaded image
+     * @description If an image is cached, this functions
      * the same as calling load() on that URL.
      */
     function get(url) {
         return resourceCache[url];
     }
 
-    /* This function determines if all of the images that have been requested
+    /**
+     * This function determines if all of the images that have been requested
      * for loading have in fact been properly loaded.
+     * @function isReady
+     * @returns {boolean} true if all images have been loaded, false otherwise
      */
     function isReady() {
         var ready = true;
@@ -92,9 +110,12 @@
         return ready;
     }
 
-    /* This function will add a function to the callback stack that is called
-     * when all requested images are properly loaded.
-     */
+     /**
+      * This function will add a function to the callback stack that is called
+      * when all requested images are properly loaded.
+      * @function onReady
+      * @param {object} func - callback function that will get called
+      */
     function onReady(func) {
         readyCallbacks.push(func);
     }

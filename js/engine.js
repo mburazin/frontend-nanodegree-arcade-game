@@ -1,7 +1,10 @@
-/* Engine.js
- * This file provides the game loop functionality (update entities and render),
- * draws the initial game board on the screen, and then calls the update and
- * render methods on your player and enemy objects (defined in your app.js).
+/**
+ * @file Engine.js - Provides the game loop functionality
+ * @author Marko Burazin <marko.burazin1@gmail.com>
+ * @description This file provides the game loop functionality (update entities
+ * and render), draws the initial game board on the screen, and then calls the
+ * update and render methods on your player and enemy objects (defined in your
+ * app.js).
  *
  * A game engine works by drawing the entire game screen over and over, kind of
  * like a flipbook you may have created as a kid. When your player moves across
@@ -27,30 +30,30 @@ var Engine = (function(global) {
         lives = doc.createElement('div'),
         gameContainer = doc.createElement('div'),
         gameOverBox = doc.createElement('div'),
+        isGameOver = false,
         lastTime,
         currentScore = 0,
         livesLeft = 5;
 
-    var collectibles = [
-      BlueGem,
-      GreenGem,
-      OrangeGem
-    ];
+    // collectible items get added here during gameplay
+    var collectibleItems = [];
 
+    // gameContainer used to center the canvas
     gameContainer.id = "game-container";
     gameContainer.width = canvas.width = 505;
     gameContainer.height = canvas.height = 606;
-
     doc.body.appendChild(gameContainer);
     gameContainer.appendChild(canvas);
 
+    // game statistics
     scoreBoard.innerHTML = '<p class="stats">Score: <span id="score">' + currentScore + '</span></p>';
     lives.innerHTML = '<p class="stats">Lives: <span id="lives">' + livesLeft + '</span>/5</p>';
     doc.body.appendChild(scoreBoard);
     doc.body.appendChild(lives);
 
+    // container for displaying game over message
     gameOverBox.id = "game-over-box";
-    gameOverBox.innerHTML = '<h1>Game Over</h1>';
+    gameOverBox.innerHTML = '<h1>Game Over</h1><p>Final score: <span id="finalScore"></span></p>';
 
 
     /* This function serves as the kickoff point for the game loop itself
@@ -80,7 +83,8 @@ var Engine = (function(global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-        win.requestAnimationFrame(main);
+        if (!isGameOver)
+          win.requestAnimationFrame(main);
     }
 
     /* This function does some initial setup that should only occur once,
@@ -90,8 +94,31 @@ var Engine = (function(global) {
     function init() {
         reset();
         lastTime = Date.now();
-        player.onWin(handleWin);
+        player.addOnWinCallback(handleWin);
+        player.addOnLoseCallback(handleLoss);
         main();
+    }
+
+    /* Callback function which gets called by the player object when it
+       reaches the water */
+    function handleWin() {
+      updateScore(10);
+      GameSounds.win();
+    }
+
+    function updateScore(points) {
+      var score = document.querySelector('#score');
+      currentScore += points;
+      score.textContent = currentScore;
+    }
+
+    /* Callback function which gets called by the player object once
+       the player loses all lives */
+    function handleLoss() {
+      gameContainer.appendChild(gameOverBox);
+      var finalScore = document.querySelector("#finalScore");
+      finalScore.textContent = currentScore;
+      isGameOver = true;
     }
 
     /* This function is called by main (our game loop) and itself calls all
@@ -105,21 +132,25 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        if(gameBoard.collisionOccured()) {
+        if(GameBoard.collisionOccured()) {
           player.kill();
+          GameSounds.die();
+
+          // decrease and show the number of lives left
           var lives = document.querySelector('#lives');
           lives.textContent = --livesLeft;
         }
 
-        if(livesLeft <= 0) {
-          gameContainer.appendChild(gameOverBox);
-        }
-
-        var collectedItem = gameBoard.itemCollected()
+        var collectedItem = GameBoard.itemCollected()
         if(collectedItem) {
           updateScore(collectedItem.points);
-          var index = gameBoard.collectibleItems.indexOf(collectedItem);
-          gameBoard.collectibleItems.splice(index, 1);
+
+          // play sound
+          GameSounds.collect();
+
+          // remove item from board
+          var index = GameBoard.collectibleItems.indexOf(collectedItem);
+          GameBoard.collectibleItems.splice(index, 1);
         }
     }
 
@@ -202,21 +233,11 @@ var Engine = (function(global) {
      */
     function reset() {
         // noop
-        gameBoard.enemies = allEnemies;
-        gameBoard.player = player;
-        gameBoard.collectibleItems = collectibleItems;
+        GameBoard.enemies = allEnemies;
+        GameBoard.player = player;
+        GameBoard.collectibleItems = collectibleItems;
 
-        win.setTimeout(spawnCollectible, getRandomInt(2, 10)*1000);
-    }
-
-    function handleWin() {
-      updateScore(10);
-    }
-
-    function updateScore(points) {
-      var score = document.querySelector('#score');
-      currentScore += points;
-      score.textContent = currentScore;
+        win.setTimeout(spawnCollectible, getRandomInt(2, 7)*1000);
     }
 
     function spawnCollectible() {

@@ -4,6 +4,7 @@ This project features a classic arcade game clone (Frogger) that was developed a
 ## How to run the game
 Just open up `index.html` in your favorite browser and the game starts automatically. If you want to start the game from the beginning, refresh the page (F5).
 Turn on your speakers for sound effects.
+You can also run the game by accessing the following link: https://mburazin.github.io/frontend-nanodegree-arcade-game/
 
 ## How to play
 
@@ -17,6 +18,7 @@ This project is licensed under the terms of the MIT license. For more informatio
 * Add the concept of level progression with increasing difficulty
 * Add buttons for starting/restarting the game
 * Possibility to choose between different player figures
+* Timed games
 
 and more...
 

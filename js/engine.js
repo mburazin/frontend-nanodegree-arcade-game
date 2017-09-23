@@ -22,7 +22,7 @@ var Engine = (function(global) {
      * create the canvas element, grab the 2D context for that canvas
      * set the canvas elements height/width and add it to the DOM.
      */
-    var doc = global.document,
+    let doc = global.document,
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
@@ -36,7 +36,7 @@ var Engine = (function(global) {
         livesLeft = 5;
 
     // collectible items get added here during gameplay
-    var collectibleItems = [];
+    let collectibleItems = [];
 
     // gameContainer used to center the canvas
     gameContainer.id = "game-container";
@@ -66,7 +66,7 @@ var Engine = (function(global) {
          * would be the same for everyone (regardless of how fast their
          * computer is) - hurray time!
          */
-        var now = Date.now(),
+        let now = Date.now(),
             dt = (now - lastTime) / 1000.0; // dt = time in seconds, not ms
 
         /* Call our update/render functions, pass along the time delta to
@@ -102,12 +102,12 @@ var Engine = (function(global) {
     /* Callback function which gets called by the player object when it
        reaches the water */
     function handleWin() {
-      updateScore(10);
+      _updateScore(10);
       GameSounds.win();
     }
 
-    function updateScore(points) {
-      var score = document.querySelector('#score');
+    function _updateScore(points) {
+      let score = document.querySelector('#score');
       currentScore += points;
       score.textContent = currentScore;
     }
@@ -116,7 +116,7 @@ var Engine = (function(global) {
        the player loses all lives */
     function handleLoss() {
       gameContainer.appendChild(gameOverBox);
-      var finalScore = document.querySelector("#finalScore");
+      let finalScore = document.querySelector("#finalScore");
       finalScore.textContent = currentScore;
       isGameOver = true;
     }
@@ -137,19 +137,19 @@ var Engine = (function(global) {
           GameSounds.die();
 
           // decrease and show the number of lives left
-          var lives = document.querySelector('#lives');
+          let lives = document.querySelector('#lives');
           lives.textContent = --livesLeft;
         }
 
-        var collectedItem = GameBoard.itemCollected()
+        let collectedItem = GameBoard.itemCollected()
         if(collectedItem) {
-          updateScore(collectedItem.points);
+          _updateScore(collectedItem.points);
 
           // play sound
           GameSounds.collect();
 
           // remove item from board
-          var index = GameBoard.collectibleItems.indexOf(collectedItem);
+          let index = GameBoard.collectibleItems.indexOf(collectedItem);
           GameBoard.collectibleItems.splice(index, 1);
         }
     }
@@ -178,7 +178,7 @@ var Engine = (function(global) {
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
-        var rowImages = [
+        let rowImages = [
                 'images/water-block.png',   // Top row is water
                 'images/stone-block.png',   // Row 1 of 3 of stone
                 'images/stone-block.png',   // Row 2 of 3 of stone
@@ -242,7 +242,7 @@ var Engine = (function(global) {
     }
 
     function spawnCollectible() {
-        var itemIndex = getRandomInt(0, collectibles.length);
+        let itemIndex = getRandomInt(0, collectibles.length);
         collectibleItems.push(new collectibles[itemIndex]());
 
         // creates a new collectible object on the board every few random seconds

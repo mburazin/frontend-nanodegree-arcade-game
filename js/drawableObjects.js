@@ -11,7 +11,7 @@
 * @param {number} locX - x coordinate in px where to draw the object
 * @param {number} locY - y coordinate in px where to draw the object
 */
-var DrawableObject = function(sprite, locX, locY) {
+let DrawableObject = function(sprite, locX, locY) {
   this.sprite = sprite;
 
   // position of the whole image on the board
@@ -44,12 +44,12 @@ DrawableObject.prototype.setPosition = function(x, y) {
  * @class
  * @extends DrawableObject
  */
-var Collectible = function() {
+let Collectible = function() {
 
   // Actual object position and dimensions within the image sprite
-  var _objectWithinImage = {
+  const _objectWithinImage = {
     "x": 0,
-    "y": 55,
+    "y": 60,
     "width": 101,
     "height": 105
   };
@@ -61,9 +61,9 @@ var Collectible = function() {
    * @param {number} points - How many points the player earns by picking up
    *                          this collectible
    */
-  var Collectible  = function(sprite, points) {
+  let Collectible  = function(sprite, points) {
     // appears random on the street
-    var x = getRandomInt(0, GameBoard.cols) * GameBoard.tileWidth,
+    let x = getRandomInt(0, GameBoard.cols) * GameBoard.tileWidth,
         y = getRandomInt(1, GameBoard.rows-2) * GameBoard.tileHeight - 30;
 
     // score associated with collecting the object
@@ -94,7 +94,7 @@ var Collectible = function() {
  * @class
  * @extends Collectible
  */
-var BlueGem = function() {
+let BlueGem = function() {
   Collectible.call(this, 'images/Gem Blue.png', 1);
 };
 BlueGem.prototype = Object.create(Collectible.prototype);
@@ -105,7 +105,7 @@ BlueGem.prototype.constructor = BlueGem;
  * @class
  * @extends Collectible
  */
-var GreenGem = function() {
+let GreenGem = function() {
   Collectible.call(this, 'images/Gem Green.png', 2);
 };
 GreenGem.prototype = Object.create(Collectible.prototype);
@@ -115,7 +115,7 @@ GreenGem.prototype.constructor = GreenGem;
  * Creates a new Orange Gem collectible object
  * @class
  */
-var OrangeGem = function() {
+let OrangeGem = function() {
   Collectible.call(this, 'images/Gem Orange.png', 3);
 };
 OrangeGem.prototype = Object.create(Collectible.prototype);
@@ -126,10 +126,10 @@ OrangeGem.prototype.constructor = OrangeGem;
  * @class
  * @extends DrawableObject
  */
-var Enemy = function() {
+let Enemy = function() {
   /* Private members */
   // Enemy position and dimensions within the image sprite
-  var _enemyWithinImage = {
+  const _enemyWithinImage = {
     "x": 0,
     "y": 80,
     "width": 101,
@@ -137,20 +137,20 @@ var Enemy = function() {
   };
 
   // offset needed to position enemy correctly within the tile
-  var _ENEMY_TILE_Y_OFFSET = -25;
+  const _ENEMY_TILE_Y_OFFSET = -25;
 
   /**
    * Creates a new Enemy.
    * @constructor
    * @param {GameBoard} GameBoard - This enemy will be placed on a game board
    */
-  var Enemy = function(GameBoard) {
+  let Enemy = function(GameBoard) {
       this.speed = getRandomInt(150, 600); // px/s
       this.gameBoard = GameBoard;
 
       // position enemies outside of board initially
-      var locX = -500;
-      var locY = getRandomInt(1, 3+1) * GameBoard.tileHeight + _ENEMY_TILE_Y_OFFSET;
+      let locX = -500;
+      let locY = getRandomInt(1, 3+1) * GameBoard.tileHeight + _ENEMY_TILE_Y_OFFSET;
 
       // call superclass constructor
       DrawableObject.call(this, 'images/enemy-bug.png', locX, locY);
@@ -195,20 +195,20 @@ var Enemy = function() {
  * @class
  * @extends DrawableObject
  */
-var Player = function() {
+let Player = function() {
   /* Private members */
   // "that" is for accessing "this" in private methods
-  var that;
-  var _gameBoard;
-  var _stepInPixels;
-  var _nextStep = 'same';
-  var _PLAYER_TILE_Y_OFFSET = -30; // position player in the center of surface
-  var _initialPosition;
-  var _onWinCallbacks = [];
-  var _onLoseCallbacks = [];
+  let that;
+  let _gameBoard;
+  let _stepInPixels;
+  let _nextStep = 'same';
+  const _PLAYER_TILE_Y_OFFSET = -30; // position player in the center of surface
+  let _initialPosition;
+  let _onWinCallbacks = [];
+  let _onLoseCallbacks = [];
 
   /* Player position and dimensions within the image sprite */
-  var _playerWithinImage = {
+  const _playerWithinImage = {
     "x": 15,
     "y": 61 - _PLAYER_TILE_Y_OFFSET,
     "width": 101 - 15*2,
@@ -220,7 +220,7 @@ var Player = function() {
    * @function update
    * @private
    */
-  var reset = function() {
+  let _reset = function() {
     that.x = _initialPosition.x;
     that.y = _initialPosition.y;
     _nextStep = 'same';
@@ -231,7 +231,7 @@ var Player = function() {
    * @constructor
    * @param {GameBoard} GameBoard - This player will be placed on a game board
    */
-  var Player = function(GameBoard) {
+  let Player = function(GameBoard) {
     that = this;
 
     _lives = 5;
@@ -258,8 +258,8 @@ var Player = function() {
    * @function update
    */
   Player.prototype.update = function() {
-    var newX = this.x;
-    var newY = this.y;
+    let newX = this.x;
+    let newY = this.y;
 
     if (_stepInPixels.hasOwnProperty(_nextStep)) {
       newX += _stepInPixels[_nextStep].x;
@@ -276,7 +276,7 @@ var Player = function() {
     // player wins (reaches water)
     if (this.y <= 0) {
       _onWinCallbacks.forEach(function(cb) { cb() });
-      reset();
+      _reset();
     }
   };
 
@@ -294,8 +294,8 @@ var Player = function() {
    * @function kill
    */
   Player.prototype.kill = function() {
-    // reset the player position and decrease number of lives
-    reset();
+    // _reset the player position and decrease number of lives
+    _reset();
     _lives--;
     if (_lives <= 0) {
       _onLoseCallbacks.forEach(function(cb) { cb() });

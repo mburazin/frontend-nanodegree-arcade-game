@@ -9,9 +9,9 @@
  */
 
 (function() {
-    var resourceCache = {};
-    var loading = [];
-    var readyCallbacks = [];
+    let resourceCache = {};
+    let loading = [];
+    let readyCallbacks = [];
 
     /**
      * This is the publicly accessible image loading function
@@ -55,7 +55,7 @@
             /* This URL has not been previously loaded and is not present
              * within our cache; we'll need to load this image.
              */
-            var img = new Image();
+            let img = new Image();
             img.onload = function() {
                 /* Once our image has properly loaded, add it to our cache
                  * so that we can simply return this image if the developer
@@ -100,8 +100,8 @@
      * @returns {boolean} true if all images have been loaded, false otherwise
      */
     function isReady() {
-        var ready = true;
-        for(var k in resourceCache) {
+        let ready = true;
+        for(let k in resourceCache) {
             if(resourceCache.hasOwnProperty(k) &&
                !resourceCache[k]) {
                 ready = false;

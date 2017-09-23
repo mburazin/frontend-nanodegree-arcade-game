@@ -5,9 +5,9 @@
 
 (function() {
 
-    dieSound = new Audio('sounds/NFF-slam.wav');
-    winSound = new Audio('sounds/NFF-chromatic-rise.wav');
-    collectSound = new Audio('sounds/NFF-zing.wav');
+    let dieSound = new Audio('sounds/NFF-slam.wav');
+    let winSound = new Audio('sounds/NFF-chromatic-rise.wav');
+    let collectSound = new Audio('sounds/NFF-zing.wav');
 
     /**
      * Plays the sound of player collision with the enemy
